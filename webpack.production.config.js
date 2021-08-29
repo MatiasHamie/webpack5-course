@@ -1,5 +1,5 @@
 const path = require("path");
-const TerserPlugin = require("terser-webpack-plugin");
+// const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -20,8 +20,10 @@ module.exports = {
     path: path.resolve(__dirname, "./dist"),
     publicPath: "", //por defecto esta en 'auto', poner 'directorio/'
   },
-
-  mode: "none",
+  // se puede poner none, development o production
+  // dependiendo que modo este puesto, webpack habilita N plugins
+  // https://webpack.js.org/configuration/mode/
+  mode: "production",
 
   module: {
     // webpack para tratar los archivos q no sean de JS, se fija si hay reglas creadas
@@ -80,7 +82,7 @@ module.exports = {
   // se tienen q instalar aparte
   plugins: [
     // esto disminuye el size del bundle
-    new TerserPlugin(),
+    // new TerserPlugin(), // esto esta habilitado por defecto en production
     // esto pone el css aparte del bundle
     // la idea es no crear un bundle enorme
     new MiniCssExtractPlugin({

@@ -40,3 +40,5 @@ npm i terser-webpack-plugin mini-css-extract-plugin clean-webpack-plugin --save-
 
 npm i handlebars handlebars-loader --save-dev
 ```
+
+ npm i webpack-dev-server --save-dev
