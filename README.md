@@ -30,10 +30,13 @@
 
 ```
 npm i css-loader style-loader sass sass-loader --save-dev
-npm i @babel/core babel-loader @babel/preset-env @babel/plugin-proposal-class-properties --save-dev 
+npm i @babel/core babel-loader @babel/preset-env @babel/plugin-proposal-class-properties --save-dev
 ```
+
 # Hay que instalar los plugins
 
 ```
-npm i terser-webpack-plugin mini-css-extract-plugin --save-dev
+npm i terser-webpack-plugin mini-css-extract-plugin clean-webpack-plugin --save-dev
+
+npm i handlebars handlebars-loader --save-dev
 ```

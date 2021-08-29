@@ -1,6 +1,8 @@
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   // esto cambia el directorio de donde tomas el index JS
@@ -11,9 +13,12 @@ module.exports = {
   // y el path tiene q estar asi, porque si lo usas asi path: './dist', tira error
   // ya que tiene que ser path absoluto
   output: {
-    filename: "bundle.js",
+    filename: "bundle.[contenthash].js",
+    // [contenthash] lo que hace es agregarle un hash al nombre
+    // del bundle, y lo actualiza cada vez q hay un cambio
+    // esto sirve para no tener un nombre estatico y que quede cacheado
     path: path.resolve(__dirname, "./dist"),
-    publicPath: "dist/", //por defecto esta en 'auto', poner 'directorio/'
+    publicPath: "", //por defecto esta en 'auto', poner 'directorio/'
   },
 
   mode: "none",
@@ -64,6 +69,12 @@ module.exports = {
           },
         },
       },
+      {
+        test: /\.hbs$/,
+        use: {
+          loader: "handlebars-loader",
+        },
+      },
     ],
   },
   // se tienen q instalar aparte
@@ -74,7 +85,37 @@ module.exports = {
     // la idea es no crear un bundle enorme
     new MiniCssExtractPlugin({
       // nombre del archivo final q une todos los estilos
-      filename: "styles.css",
+      filename: "styles.[contenthash].css",
+    }),
+    // esto borra todos los archivos de los paths antes de buildear
+    // la idea es que no queden los bundles anteriores
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [
+        "**/*", // esto es en .dist por defecto
+        // si se quiere borrar otra carpeta se especifica asi
+        path.join(process.cwd(), "build/**/*"),
+      ],
+    }),
+    // como usamos nombres hasheados para css y js,
+    // se necesita que se auto actualicen los imports de los scrips y styles
+    // en el index.html buildeado, lo que hace este plugin es actualizar eso
+    new HtmlWebpackPlugin({
+      // Este plugin le cambia el titulo al index.html en el head
+      // por lo que aca se le pone el titulo que se quiere
+      title: "Hello World",
+      // le podes decir que el archivo html te lo ubique donde vos quieras
+      // un ejemplo seria
+      // filename: "subfolder/custom_filename.html",
+      // agregando una metatag nueva
+      // si no uso handlebars u otro template
+      //   meta: {
+      //     description: "Some descript",
+      //   },
+      description: "Some description", // si uso handlebars u otro template lo dejo asi
+      // usando handlebars (template para crear un html mas personalizado)
+      // como hbs no es un archivo conocido por defecto por webpack
+      // tenemos q decirle como manejarlo
+      template: "src/index.hbs",
     }),
   ],
 };
