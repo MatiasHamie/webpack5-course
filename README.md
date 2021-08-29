@@ -26,14 +26,14 @@
  };
 ```
 
-# Hay que instalar los loaders
+# Instalar los loaders
 
 ```
 npm i css-loader style-loader sass sass-loader --save-dev
 npm i @babel/core babel-loader @babel/preset-env @babel/plugin-proposal-class-properties --save-dev
 ```
 
-# Hay que instalar los plugins
+# Instalar los plugins
 
 ```
 npm i terser-webpack-plugin mini-css-extract-plugin clean-webpack-plugin --save-dev
@@ -41,4 +41,8 @@ npm i terser-webpack-plugin mini-css-extract-plugin clean-webpack-plugin --save-
 npm i handlebars handlebars-loader --save-dev
 ```
 
+# Instalar localhost webpack server
+
+```
  npm i webpack-dev-server --save-dev
+```
