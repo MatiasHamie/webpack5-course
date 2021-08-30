@@ -1,19 +1,26 @@
 const path = require("path");
 // const TerserPlugin = require("terser-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   // esto cambia el directorio de donde tomas el index JS
-  entry: "./src/index.js",
+  // si queremos un solo bundle hacemos asi
+  // entry: "./src/index.js",
+
+  // si tenemos multiples paginas y queremos separar en varios bundles
+  entry: {
+    "hello-world": "./src/index.js",
+    kiwi: "./src/kiwi.js",
+  },
 
   // esto genera el bundle, por defecto crea un main.js,
   // lo cambie a bundle.js
   // y el path tiene q estar asi, porque si lo usas asi path: './dist', tira error
   // ya que tiene que ser path absoluto
   output: {
-    filename: "bundle.js", // no necesitamos hashear el bundle en desarrollo
+    filename: "[name].bundle.js", // no necesitamos hashear el bundle en desarrollo
     // [contenthash] lo que hace es agregarle un hash al nombre
     // del bundle, y lo actualiza cada vez q hay un cambio
     // esto sirve para no tener un nombre estatico y que quede cacheado
@@ -40,7 +47,7 @@ module.exports = {
       index: "index.html",
       // por defecto webpack genera archivos en memoria pero no los guarda en el disco, por lo que no buildea
       // entonces le digo que escriba / guarde en el disco lo que voy actualizando en mientras webpack serve
-      writeToDisk: true, 
+      writeToDisk: true,
     },
   },
 
@@ -129,6 +136,14 @@ module.exports = {
     // se necesita que se auto actualicen los imports de los scrips y styles
     // en el index.html buildeado, lo que hace este plugin es actualizar eso
     new HtmlWebpackPlugin({
+      filename: "hello-world.html",
+      // chunks sirve para crear el html al hacer el building
+      // de forma tal que tome el filename q se especifico
+      // en entry{} arriba de todo este archivo
+      // tiene q coincidir con la key
+      // de esta forma hacemos un html por cada pagina q querramos
+      // para eso se necesitan instancias de este plugin
+      chunks: ["hello-world"],
       // Este plugin le cambia el titulo al index.html en el head
       // por lo que aca se le pone el titulo que se quiere
       title: "Hello World",
@@ -144,7 +159,14 @@ module.exports = {
       // usando handlebars (template para crear un html mas personalizado)
       // como hbs no es un archivo conocido por defecto por webpack
       // tenemos q decirle como manejarlo
-      template: "src/index.hbs",
+      template: "src/page-template.hbs",
+    }),
+    new HtmlWebpackPlugin({
+      filename: "kiwi.html",
+      chunks: ["kiwi"],
+      title: "Kiwi",
+      description: "Kiwi",
+      template: "src/page-template.hbs",
     }),
   ],
 };

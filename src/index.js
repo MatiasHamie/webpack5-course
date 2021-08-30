@@ -1,14 +1,14 @@
-import addImage from "./add-image";
 import Heading from "./components/heading/heading";
 import HelloWorldButton from "./components/hello-world-button/hello-world-button";
+// import _ from "lodash";
+import React from "react";
 
 const heading = new Heading();
-heading.render();
+// heading.render(_.upperFirst("hello world"));
+heading.render("hello world");
 
 const helloWorldButton = new HelloWorldButton();
 helloWorldButton.render();
-
-addImage();
 
 if (process.env.NODE_ENV === "production") {
   console.log("Production Mode");

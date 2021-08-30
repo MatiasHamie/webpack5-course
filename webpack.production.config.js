@@ -6,14 +6,24 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   // esto cambia el directorio de donde tomas el index JS
-  entry: "./src/index.js",
+  // si queremos un solo bundle hacemos asi
+  // entry: "./src/index.js",
+
+  // si tenemos multiples paginas y queremos separar en varios bundles
+  entry: {
+    "hello-world": "./src/index.js",
+    kiwi: "./src/kiwi.js",
+  },
 
   // esto genera el bundle, por defecto crea un main.js,
   // lo cambie a bundle.js
   // y el path tiene q estar asi, porque si lo usas asi path: './dist', tira error
   // ya que tiene que ser path absoluto
   output: {
-    filename: "bundle.[contenthash].js",
+    // [name] toma el nombre de cada entry que configuramos arriba
+    // (kiwi, hello-world, etc.) y lo reemplaza
+    // [id] puede ser tambien pero no es un nombre legible
+    filename: "[name].[contenthash].js",
     // [contenthash] lo que hace es agregarle un hash al nombre
     // del bundle, y lo actualiza cada vez q hay un cambio
     // esto sirve para no tener un nombre estatico y que quede cacheado
@@ -24,6 +34,20 @@ module.exports = {
   // dependiendo que modo este puesto, webpack habilita N plugins
   // https://webpack.js.org/configuration/mode/
   mode: "production",
+  // en el caso de que importemos una libreria en varias paginas
+  // Hay q poner esto para q no importe la libreria en comun SIEMPRE
+  // en CADA pagina q lo usa, tenemos q decirle a webpack q optimice eso
+  // caso contrario, cada bundle se vuelve re pesado
+  // lo q hace es generar un bundle aparte con la dependencia sola
+  // y la incluye cuando la importe en algun lado
+  // por defecto eso lo hace si la dependencia q importe pesa mas de 30 kb
+  // eso se puede editar con minSize
+  optimization: {
+    splitChunks: {
+      chunks: "all",
+      minSize: 3000, //casi 3kb
+    },
+  },
 
   module: {
     // webpack para tratar los archivos q no sean de JS, se fija si hay reglas creadas
@@ -87,7 +111,9 @@ module.exports = {
     // la idea es no crear un bundle enorme
     new MiniCssExtractPlugin({
       // nombre del archivo final q une todos los estilos
-      filename: "styles.[contenthash].css",
+      // esto es idem con el bundle.js de arriba
+      // [name] o [id]
+      filename: "[name].[contenthash].css",
     }),
     // esto borra todos los archivos de los paths antes de buildear
     // la idea es que no queden los bundles anteriores
@@ -102,6 +128,14 @@ module.exports = {
     // se necesita que se auto actualicen los imports de los scrips y styles
     // en el index.html buildeado, lo que hace este plugin es actualizar eso
     new HtmlWebpackPlugin({
+      filename: "hello-world.html",
+      // chunks sirve para crear el html al hacer el building
+      // de forma tal que tome el filename q se especifico
+      // en entry{} arriba de todo este archivo
+      // tiene q coincidir con la key
+      // de esta forma hacemos un html por cada pagina q querramos
+      // para eso se necesitan instancias de este plugin
+      chunks: ["hello-world"],
       // Este plugin le cambia el titulo al index.html en el head
       // por lo que aca se le pone el titulo que se quiere
       title: "Hello World",
@@ -117,7 +151,15 @@ module.exports = {
       // usando handlebars (template para crear un html mas personalizado)
       // como hbs no es un archivo conocido por defecto por webpack
       // tenemos q decirle como manejarlo
-      template: "src/index.hbs",
+      template: "src/page-template.hbs",
+      // minify: false, // customizable el minificado true o false
+    }),
+    new HtmlWebpackPlugin({
+      filename: "kiwi.html",
+      chunks: ["kiwi"],
+      title: "Kiwi",
+      description: "Kiwi",
+      template: "src/page-template.hbs",
     }),
   ],
 };
